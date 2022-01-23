@@ -1,7 +1,8 @@
 #include "GradskaMreza.h"
 
-#include <fstream>
 #include <algorithm>
+#include <fstream>
+#include <queue>
 using namespace std;
 
 void GradskaMreza::test() {
@@ -77,7 +78,7 @@ void GradskaMreza::ucitajLinije(const string& filepath) {
 	ulaz.close();
 }
 
-void GradskaMreza::eksportujStajaliste(const int sifraStajalista) {
+void GradskaMreza::eksportujStajaliste(int sifraStajalista) {
 	inicijalizujGraf();
 	const int id = idStajalista(sifraStajalista);
 	const string filepath = "stajaliste_" + to_string(sifraStajalista) + ".txt";
@@ -126,6 +127,16 @@ void GradskaMreza::eksportujLiniju(const string& oznakaLinije) {
 	izlaz.close();
 }
 
+void GradskaMreza::najbrzaPutanja(int pocetnoStajaliste, int krajnjeStajaliste, int satPolaska, int minutPolaska) {
+	vector<Grana> put = nadjiPutanju(pocetnoStajaliste, krajnjeStajaliste, satPolaska, minutPolaska, NAJBRZE);
+	ispisiPutanju(pocetnoStajaliste, put);
+}
+
+void GradskaMreza::najmanjePresedanjaPutanja(int pocetnoStajaliste, int krajnjeStajaliste, int satPolaska, int minutPolaska) {
+	vector<Grana> put = nadjiPutanju(pocetnoStajaliste, krajnjeStajaliste, satPolaska, minutPolaska, NAJMANJE_PRESEDANJA);
+	ispisiPutanju(pocetnoStajaliste, put);
+}
+
 int GradskaMreza::idStajalista(int sifraStajalista) {
 	return mapaStajalista[sifraStajalista];
 }
@@ -164,4 +175,65 @@ void GradskaMreza::inicijalizujGraf() {
 
 int GradskaMreza::idLinije(const string& oznakaLinije) {
 	return mapaLinija[oznakaLinije];
+}
+
+vector<Grana> GradskaMreza::nadjiPutanju(int pocetnoStajaliste, int krajnjeStajaliste, int satPolaska, int minutPolaska, Kriterijum kriterijum) {
+	inicijalizujGraf();
+	krajnjeStajaliste = idStajalista(krajnjeStajaliste);
+	priority_queue<DijkstraCvor, vector<DijkstraCvor>, DijkstraFunkcijaKriterijuma> dijkstra;
+	dijkstra.push(DijkstraCvor(idStajalista(pocetnoStajaliste), -1, Grana(), 60 * satPolaska + minutPolaska, 0, kriterijum));
+	vector<DijkstraCvor> cvorovi(stajalista.size());
+	vector<bool> posecen(stajalista.size());
+	while (!dijkstra.empty()) {
+		DijkstraCvor trenutniCvor = dijkstra.top();
+		dijkstra.pop();
+		int trenutnoStajalisteId = trenutniCvor.dohStanicu();
+
+		if (posecen[trenutnoStajalisteId]) {
+			continue;
+		}
+		posecen[trenutnoStajalisteId] = true;
+		cvorovi[trenutnoStajalisteId] = trenutniCvor;
+
+		if (trenutnoStajalisteId == krajnjeStajaliste) {
+			vector<Grana> put;
+			while (trenutniCvor.dohProsluStanicu() != -1) {
+				put.push_back(trenutniCvor.dohProsluGranu());
+				trenutniCvor = cvorovi[trenutniCvor.dohProsluStanicu()];
+			}
+			reverse(put.begin(), put.end());
+			return put;
+		}
+
+		int vreme = trenutniCvor.dohVreme();
+		Grana proslaGrana = trenutniCvor.dohProsluGranu();
+
+		for (Grana grana : graf[trenutnoStajalisteId]) {
+			int presedanja = trenutniCvor.dohPresedanja();
+			int proslaStanica = trenutniCvor.dohProsluStanicu();
+			if (proslaStanica == -1 || proslaGrana.dohLinija() != grana.dohLinija()) {
+				presedanja++;
+			}
+			dijkstra.push(DijkstraCvor(grana.dohStanica(), trenutnoStajalisteId, grana, nadjiVremeDolaska(trenutnoStajalisteId, grana, vreme), presedanja, kriterijum));
+		}
+	}
+	return vector<Grana>();
+}
+
+void GradskaMreza::ispisiPutanju(int pocetnoStajaliste, vector<Grana> putanja) {
+	cout << pocetnoStajaliste;
+	for (Grana grana : putanja) {
+		cout << "\n" << stajalista[grana.dohStanica()].dohSifru() << " " << linije[grana.dohLinija()].dohOznaku();
+	}
+}
+
+int GradskaMreza::nadjiVremeDolaska(int idStanice,const Grana& granaDoSledece, int vreme) {
+	int sifraStajalista = stajalista[idStanice].dohSifru();
+	bool direktanSmer = granaDoSledece.direktna();
+	Linija& linija = linije[granaDoSledece.dohLinija()];
+	int sledeciDolazak = linija.sledeciDolazak(vreme, sifraStajalista, direktanSmer);
+	if (sledeciDolazak == -1) {
+		return -1;
+	}
+	return sledeciDolazak + vremeDoSledeceStanice;
 }

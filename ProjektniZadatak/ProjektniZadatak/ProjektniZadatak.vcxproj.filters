@@ -27,6 +27,9 @@
     <ClCompile Include="Linija.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Graf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stajaliste.h">
@@ -36,6 +39,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GradskaMreza.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

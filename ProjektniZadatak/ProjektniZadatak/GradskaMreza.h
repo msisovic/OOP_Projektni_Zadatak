@@ -4,22 +4,9 @@
 #include <map>
 using namespace std;
 
+#include "Graf.h"
 #include "Linija.h"
 #include "Stajaliste.h"
-
-class Grana {
-public:
-	Grana(int stanica, int linija, bool direktanSmer) :stanica(stanica), linija(linija), direktanSmer(direktanSmer) {};
-
-	int dohLinija() { return linija; }
-	int dohStanica() { return stanica; }
-	int direktna() { return direktanSmer; }
-
-private:
-	int linija;
-	int stanica;
-	bool direktanSmer;
-};
 
 class GradskaMreza {
 public:
@@ -30,8 +17,11 @@ public:
 	void ucitajStajalista(const string& filepath);
 	void ucitajLinije(const string& filepath);
 
-	void eksportujStajaliste(const int sifraStajalista);
+	void eksportujStajaliste(int sifraStajalista);
 	void eksportujLiniju(const string& oznakaLinije);
+
+	void najbrzaPutanja(int pocetnoStajaliste, int krajnjeStajaliste, int satPolaska, int minutPolaska);
+	void najmanjePresedanjaPutanja(int pocetnoStajaliste, int krajnjeStajaliste, int satPolaska, int minutPolaska);
 
 private:
 	vector<Stajaliste> stajalista;
@@ -45,6 +35,10 @@ private:
 	map<string,int> mapaLinija;
 	int idStajalista(const int sifraStajalista);
 	int idLinije(const string& oznakaLinije);
+
+	vector<Grana> nadjiPutanju(int pocetnoStajaliste, int krajnjeStajaliste, int satPolaska, int minutPolaska, Kriterijum kriterijum);
+	void ispisiPutanju(int pocetnoStajaliste, vector<Grana> putanja);
+	int nadjiVremeDolaska(int idStanice, const Grana& granaDoSledece, int vreme);
 };
 
 #endif

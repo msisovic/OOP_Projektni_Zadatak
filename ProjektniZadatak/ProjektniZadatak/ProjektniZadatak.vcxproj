@@ -139,9 +139,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GradskaMreza.cpp" />
+    <ClCompile Include="Linija.cpp" />
+    <ClCompile Include="Stajaliste.cpp" />
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GradskaMreza.h" />
+    <ClInclude Include="Linija.h" />
     <ClInclude Include="Stajaliste.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

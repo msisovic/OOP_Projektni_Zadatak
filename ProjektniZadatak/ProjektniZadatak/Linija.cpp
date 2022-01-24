@@ -19,12 +19,28 @@ const int Linija::sledeciDolazak(int vreme, int stajaliste, bool direktanSmer) c
 	else {
 		rbrStajalista = 2 * stajalista.size() - idStajalista - 2;
 	}
-	int vremePocetne = vreme - rbrStajalista * vremeDoSledeceStanice;
-	int sledeciPolazak = (vremePocetne - prviPolazak + razmakPolazaka - 1) / razmakPolazaka * razmakPolazaka;
+	int vremePocetne = max(vreme - rbrStajalista * vremeDoSledeceStanice, prviPolazak);
+	int sledeciPolazak = (vremePocetne - prviPolazak + razmakPolazaka - 1) / razmakPolazaka * razmakPolazaka + prviPolazak;
 	if (sledeciPolazak <= poslednjiPolazak) {
 		return sledeciPolazak + rbrStajalista * vremeDoSledeceStanice;
 	}
 	else {
 		return -1;
 	}
+}
+
+const vector<int> Linija::staniceNaPutu(int prvaStanica, int poslednjaStanica) const {
+	int prvaStanicaId = mapaStajalista.at(prvaStanica), poslednjaStanicaId = mapaStajalista.at(poslednjaStanica);
+	vector<int> put;
+	if (prvaStanicaId <= poslednjaStanicaId) {
+		for (int i = prvaStanicaId; i <= poslednjaStanicaId; i++) {
+			put.push_back(stajalista[i]);
+		}
+	}
+	else {
+		for (int i = prvaStanicaId; i >= poslednjaStanicaId; i--) {
+			put.push_back(stajalista[i]);
+		}
+	}
+	return put;
 }

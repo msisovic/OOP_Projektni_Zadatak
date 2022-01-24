@@ -12,5 +12,5 @@ int main() {
 	gradskaMreza.ucitajLinije("linije.txt");
 	gradskaMreza.eksportujStajaliste(422);
 	gradskaMreza.eksportujLiniju("12");
-	gradskaMreza.najmanjePresedanjaPutanja(123, 1221, 12, 0);
+	gradskaMreza.najbrzaPutanja(123, 1221, 12, 0);
 }

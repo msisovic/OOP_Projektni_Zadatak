@@ -37,8 +37,8 @@ private:
 	int idLinije(const string& oznakaLinije);
 
 	vector<Grana> nadjiPutanju(int pocetnoStajaliste, int krajnjeStajaliste, int satPolaska, int minutPolaska, Kriterijum kriterijum);
-	void ispisiPutanju(int pocetnoStajaliste, vector<Grana> putanja);
-	int nadjiVremeDolaska(int idStanice, const Grana& granaDoSledece, int vreme);
+	void ispisiPutanju(int pocetnoStajaliste, int krajnjeStajaliste, vector<Grana> putanja);
+	int nadjiVremeDolaska(int idStanice, const Grana& granaDoSledece, int vreme, int brojStanica);
 };
 
 #endif

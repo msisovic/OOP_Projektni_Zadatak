@@ -3,14 +3,16 @@
 
 class Grana {
 public:
-	Grana(int stanica, int linija, bool direktanSmer) :stanica(stanica), linija(linija), direktanSmer(direktanSmer) {};
+	Grana(int stanica, int linija, bool direktanSmer, int brojStanica) :stanica(stanica), linija(linija), direktanSmer(direktanSmer), brojStanica(brojStanica) {};
 	Grana() { linija = -1; };
 
 	int dohLinija() const { return linija; }
 	int dohStanica() const { return stanica; }
 	int direktna() const { return direktanSmer; }
+	int dohBrojStanica() const { return brojStanica; }
 
 private:
+	int brojStanica;
 	int linija;
 	int stanica;
 	bool direktanSmer;

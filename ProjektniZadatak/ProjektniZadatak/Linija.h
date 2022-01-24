@@ -19,6 +19,7 @@ public:
 	const vector<int> dohStajalista() const { return stajalista; }
 
 	const int sledeciDolazak(int vreme, int stajaliste, bool direktanSmer) const;
+	const vector<int> staniceNaPutu(int prvaStanica, int poslednjaStanica) const;
 
 private:
 	string oznakaLinije;

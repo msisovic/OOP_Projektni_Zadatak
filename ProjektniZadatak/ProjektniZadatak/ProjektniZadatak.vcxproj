@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="GradskaMreza.cpp" />
     <ClCompile Include="Graf.cpp" />
+    <ClCompile Include="InteraktivniSistem.cpp" />
     <ClCompile Include="Linija.cpp" />
     <ClCompile Include="Stajaliste.cpp" />
     <ClCompile Include="Test.cpp" />
@@ -148,6 +149,7 @@
   <ItemGroup>
     <ClInclude Include="GradskaMreza.h" />
     <ClInclude Include="Graf.h" />
+    <ClInclude Include="InteraktivniSistem.h" />
     <ClInclude Include="Linija.h" />
     <ClInclude Include="Stajaliste.h" />
   </ItemGroup>

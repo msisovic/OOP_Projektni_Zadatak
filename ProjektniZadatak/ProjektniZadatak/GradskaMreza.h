@@ -19,6 +19,7 @@ public:
 
 	void eksportujStajaliste(int sifraStajalista);
 	void eksportujLiniju(const string& oznakaLinije);
+	void eksportujStatistiku(const string& oznakaLinije);
 
 	void najbrzaPutanja(int pocetnoStajaliste, int krajnjeStajaliste, int satPolaska, int minutPolaska);
 	void najmanjePresedanjaPutanja(int pocetnoStajaliste, int krajnjeStajaliste, int satPolaska, int minutPolaska);
@@ -30,6 +31,8 @@ private:
 	bool grafInicijalizovan;
 	vector<vector<Grana>> graf;
 	void inicijalizujGraf();
+
+	bool linijeSeSeku(int idLinije1, int idLinije2);
 
 	map<int,int> mapaStajalista;
 	map<string,int> mapaLinija;

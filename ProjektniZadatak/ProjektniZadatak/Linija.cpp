@@ -10,6 +10,10 @@ Linija::Linija(const string& oznakaLinije, int prviPolazak, int poslednjiPolazak
 	}
 }
 
+const int Linija::brojPolazaka() const {
+	return (poslednjiPolazak - prviPolazak) / razmakPolazaka + 1;
+}
+
 const int Linija::sledeciDolazak(int vreme, int stajaliste, bool direktanSmer) const {
 	int idStajalista = mapaStajalista.at(stajaliste);
 	int rbrStajalista;

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <queue>
+#include <set>
 using namespace std;
 
 void GradskaMreza::test() {
@@ -88,7 +89,7 @@ void GradskaMreza::eksportujStajaliste(int sifraStajalista) {
 
 	vector<string> naziviLinija;
 	for (Grana grana : graf[id]) {
-		if (grana.direktna()) {
+		if (grana.direktna() && grana.dohBrojStanica() == 1) {
 			const int idLinije = grana.dohLinija();
 			const string nazivLinije = linije[idLinije].dohOznaku();
 			naziviLinija.push_back(nazivLinije);
@@ -123,6 +124,29 @@ void GradskaMreza::eksportujLiniju(const string& oznakaLinije) {
 		int idTren = idStajalista(stajaliste);
 		izlaz << "\n" << stajalista[idTren];
 	}
+
+	izlaz.close();
+}
+
+void GradskaMreza::eksportujStatistiku(const string& oznakaLinije) {
+	const int id = idLinije(oznakaLinije);
+	const Linija& linija = linije[id];
+	const string filepath = "statistika_" + oznakaLinije + ".txt";
+	ofstream izlaz(filepath);
+
+	izlaz << oznakaLinije << "\n";
+
+	for (int i = 0; i < linije.size(); i++) {
+		if (id == i) {
+			continue;
+		}
+		if (linijeSeSeku(id, i)) {
+			izlaz << linije[i].dohOznaku() << " ";
+		}
+	}
+	izlaz << "\n";
+
+	izlaz << linija.brojPolazaka();
 
 	izlaz.close();
 }
@@ -172,6 +196,21 @@ void GradskaMreza::inicijalizujGraf() {
 	}
 
 	grafInicijalizovan = true;
+}
+
+bool GradskaMreza::linijeSeSeku(int idLinije1, int idLinije2) {
+	set<int> stajalistaPrve;
+	for (int stajaliste : linije[idLinije1].dohStajalista()) {
+		stajalistaPrve.insert(stajaliste);
+	}
+
+	for (int stajaliste : linije[idLinije2].dohStajalista()) {
+		if (stajalistaPrve.find(stajaliste) != stajalistaPrve.end()) {
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 int GradskaMreza::idLinije(const string& oznakaLinije) {

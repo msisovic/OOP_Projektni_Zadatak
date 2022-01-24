@@ -17,6 +17,7 @@ public:
 
 	const string dohOznaku() const { return oznakaLinije; }
 	const vector<int> dohStajalista() const { return stajalista; }
+	const int brojPolazaka() const;
 
 	const int sledeciDolazak(int vreme, int stajaliste, bool direktanSmer) const;
 	const vector<int> staniceNaPutu(int prvaStanica, int poslednjaStanica) const;

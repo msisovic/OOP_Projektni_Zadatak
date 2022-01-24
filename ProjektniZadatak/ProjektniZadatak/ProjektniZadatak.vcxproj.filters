@@ -30,6 +30,9 @@
     <ClCompile Include="Graf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="InteraktivniSistem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Stajaliste.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Graf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InteraktivniSistem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

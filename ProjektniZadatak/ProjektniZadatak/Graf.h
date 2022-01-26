@@ -12,10 +12,10 @@ public:
 	int dohBrojStanica() const { return brojStanica; }
 
 private:
-	int brojStanica;
+	int brojStanica;//broj stanica izmedju stanica koje grana povezuje
 	int linija;
-	int stanica;
-	bool direktanSmer;
+	int stanica;//stanica u koju ulazi grana
+	bool direktanSmer;//da li je smer kretanja autobusa direktan
 };
 
 enum Kriterijum {
@@ -25,28 +25,29 @@ enum Kriterijum {
 
 class DijkstraCvor {
 public:
-	DijkstraCvor(int stanica, int proslaStanica, Grana proslaGrana, int vreme, int presedanja, Kriterijum kriterijum) :stanica(stanica), proslaStanica(proslaStanica), proslaGrana(proslaGrana), vreme(vreme), presedanja(presedanja), kriterijum(kriterijum) {};
+	DijkstraCvor(int stanicaId, int proslaStanicaId, Grana proslaGranaId, int vreme, int presedanja, Kriterijum kriterijum) :stanicaId(stanicaId), proslaStanicaId(proslaStanicaId), proslaGranaId(proslaGranaId), vreme(vreme), presedanja(presedanja), kriterijum(kriterijum) {};
 	DijkstraCvor() = default;
 
-	int dohStanicu() { return stanica; }
-	int dohProsluStanicu() { return proslaStanica; }
-	Grana dohProsluGranu() { return proslaGrana; } 
-	int dohVreme() { return vreme; }
-	int dohPresedanja() { return presedanja; }
-	Kriterijum dohKriterijum() { return kriterijum; }
+	int dohStanicuId() const { return stanicaId; }
+	int dohProsluStanicuId() const { return proslaStanicaId; }
+	Grana dohProsluGranuId() const { return proslaGranaId; } 
+	int dohVreme() const { return vreme; }
+	int dohPresedanja() const { return presedanja; }
+	Kriterijum dohKriterijum() const { return kriterijum; }
 
 private:
-	int stanica;
-	int proslaStanica;
-	Grana proslaGrana;
+	int stanicaId;
+	int proslaStanicaId;
+	Grana proslaGranaId;
 	int vreme;
 	int presedanja;
 	Kriterijum kriterijum;
 };
 
+//Ova klasa postoji zbog poredjenja unutar priority_queue-a
 class DijkstraFunkcijaKriterijuma {
 public:
-	bool operator()(DijkstraCvor prvi, DijkstraCvor drugi);
+	bool operator()(const DijkstraCvor& prvi, const DijkstraCvor& drugi);
 };
 
 #endif

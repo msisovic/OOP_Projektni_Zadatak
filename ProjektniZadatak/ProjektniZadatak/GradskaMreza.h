@@ -10,8 +10,6 @@ using namespace std;
 
 class GradskaMreza {
 public:
-	void test();
-
 	GradskaMreza() { grafInicijalizovan = false; };
 
 	void ucitajStajalista(const string& filepath);
@@ -34,6 +32,7 @@ private:
 
 	bool linijeSeSeku(int idLinije1, int idLinije2);
 
+	//Sluzi za mapiranje iz sifre/oznake u indeks u nizu
 	map<int,int> mapaStajalista;
 	map<string,int> mapaLinija;
 	int idStajalista(const int sifraStajalista);

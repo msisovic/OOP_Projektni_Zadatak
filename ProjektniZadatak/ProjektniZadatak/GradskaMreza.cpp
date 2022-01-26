@@ -1,4 +1,5 @@
 #include "GradskaMreza.h"
+#include "Izuzeci.h"
 
 #include <algorithm>
 #include <fstream>
@@ -6,21 +7,15 @@
 #include <set>
 using namespace std;
 
-void GradskaMreza::test() {
-	for (Stajaliste s : stajalista) {
-		cout << s << "\n";
-	}
-	cout << "\n";
-	for (Linija l : linije) {
-		cout << l << "\n";
-	}
-}
-
 void GradskaMreza::ucitajStajalista(const string& filepath) {
 	stajalista.clear();
 	grafInicijalizovan = false;
 
 	ifstream ulaz(filepath);
+	if (ulaz.fail()) {
+		throw INepostojecaDatotoeka();
+	}
+
 	int sifraStajalista;
 	string nazivStajalista;
 	while (ulaz >> sifraStajalista) {
@@ -36,33 +31,55 @@ void GradskaMreza::ucitajLinije(const string& filepath) {
 	grafInicijalizovan = false;
 
 	ifstream ulaz(filepath);
+	if (ulaz.fail()) {
+		throw INepostojecaDatotoeka();
+	}
+
 	string oznakaLinije;
 	while (ulaz>>oznakaLinije) {
-		char d1, d2;
-		ulaz >> d1 >> d2;
+		char d1;
+		ulaz >> d1;
+		if (d1 != '[') {
+			throw INepropisanFormatUlaza();
+		}
 
 		int prviSat;
 		ulaz >> prviSat;
 		ulaz >> d1;
+		if (d1 != ':') {
+			throw INepropisanFormatUlaza();
+		}
 		int prviMinut;
 		ulaz >> prviMinut;
 		int prviPolazak = 60 * prviSat + prviMinut;
 
 		ulaz >> d1;
+		if (d1 != '-') {
+			throw INepropisanFormatUlaza();
+		}
 
 		int poslednjiSat;
 		ulaz >> poslednjiSat;
 		ulaz >> d1;
+		if (d1 != ':') {
+			throw INepropisanFormatUlaza();
+		}
 		int poslednjiMinut;
 		ulaz >> poslednjiMinut;
 		int poslednjiPolazak = 60 * poslednjiSat + poslednjiMinut;
 
 		ulaz >> d1;
+		if (d1 != '#') {
+			throw INepropisanFormatUlaza();
+		}
 
 		int razmakPolazaka;
 		ulaz >> razmakPolazaka;
 
 		ulaz >> d1;
+		if (d1 != ']') {
+			throw INepropisanFormatUlaza();
+		}
 
 		vector<int> stajalista;
 		int sifraStajalista;
@@ -87,8 +104,9 @@ void GradskaMreza::eksportujStajaliste(int sifraStajalista) {
 
 	izlaz << stajalista[id];
 
+	//nalazimo sve linije koje prolaze kroz stajaliste tako sto vidimo pomocu kojih linija mozemo stici do susednih stanica, sto imamo u grafu
 	vector<string> naziviLinija;
-	for (Grana grana : graf[id]) {
+	for (Grana& grana : graf[id]) {
 		if (grana.direktna() && grana.dohBrojStanica() == 1) {
 			const int idLinije = grana.dohLinija();
 			const string nazivLinije = linije[idLinije].dohOznaku();
@@ -161,7 +179,11 @@ void GradskaMreza::najmanjePresedanjaPutanja(int pocetnoStajaliste, int krajnjeS
 	ispisiPutanju(pocetnoStajaliste, krajnjeStajaliste, put);
 }
 
+//vraca indeks stajalista u nizu stajalista na osnovu njegove sifre
 int GradskaMreza::idStajalista(int sifraStajalista) {
+	if (mapaStajalista.find(sifraStajalista) == mapaStajalista.end()) {
+		throw INepostojecaStanica();
+	}
 	return mapaStajalista[sifraStajalista];
 }
 
@@ -170,6 +192,7 @@ void GradskaMreza::inicijalizujGraf() {
 		return;
 	}
 
+	//inicijalizuje mapiranje is sifre/oznake u indeks u nizu za stajalista/linije
 	mapaLinija.clear();
 	mapaStajalista.clear();
 	for (int i = 0; i < stajalista.size(); i++) {
@@ -179,6 +202,7 @@ void GradskaMreza::inicijalizujGraf() {
 		mapaLinija[linije[i].dohOznaku()] = i;
 	}
 
+	//Za svake dve stanice kroz koje bilo koja linija prolazi dodajemo grane u grafu koje ih povezuju u uba smera
 	graf.clear();
 	graf.resize(stajalista.size());
 	for (int i = 0; i < linije.size(); i++) {
@@ -186,8 +210,8 @@ void GradskaMreza::inicijalizujGraf() {
 		int idTrenLinije = idLinije(linije[i].dohOznaku());
 		for (int j = 0; j < stajalistaLinije.size(); j++) {
 			for (int k = j + 1; k < stajalistaLinije.size(); k++) {
-				int stajaliste1 = stajalistaLinije[j], stajaliste2 = stajalistaLinije[k];
-				int stajaliste1Id = idStajalista(stajaliste1), stajaliste2Id = idStajalista(stajaliste2);
+				int stajaliste1Sifra = stajalistaLinije[j], stajaliste2Sifra = stajalistaLinije[k];
+				int stajaliste1Id = idStajalista(stajaliste1Sifra), stajaliste2Id = idStajalista(stajaliste2Sifra);
 				int brojStanica = k - j;
 				graf[stajaliste1Id].push_back(Grana(stajaliste2Id, idTrenLinije, true, brojStanica));
 				graf[stajaliste2Id].push_back(Grana(stajaliste1Id, idTrenLinije, false, brojStanica));
@@ -213,51 +237,61 @@ bool GradskaMreza::linijeSeSeku(int idLinije1, int idLinije2) {
 	return false;
 }
 
+//vraca indeks u nizu linija na osnovu njene oznake
 int GradskaMreza::idLinije(const string& oznakaLinije) {
+	if (mapaLinija.find(oznakaLinije) == mapaLinija.end()) {
+		throw INepostojecaLinija();
+	}
 	return mapaLinija[oznakaLinije];
 }
 
+//Pronalazi put izmedju dva stajalista a osnovu kriterijuma i vremena polaska, ako put ne postoji vraca prazan vektor
+//Koristi dijkstrin algoritam
 vector<Grana> GradskaMreza::nadjiPutanju(int pocetnoStajaliste, int krajnjeStajaliste, int satPolaska, int minutPolaska, Kriterijum kriterijum) {
 	inicijalizujGraf();
 	int krajnjeStajalisteId = idStajalista(krajnjeStajaliste);
 	priority_queue<DijkstraCvor, vector<DijkstraCvor>, DijkstraFunkcijaKriterijuma> dijkstra;
 	int polaznoVreme = 60 * satPolaska + minutPolaska;
 	dijkstra.push(DijkstraCvor(idStajalista(pocetnoStajaliste), -1, Grana(), polaznoVreme, 0, kriterijum));
-	vector<DijkstraCvor> cvorovi(stajalista.size());
-	vector<bool> posecen(stajalista.size());
+
+	vector<DijkstraCvor> cvorovi(stajalista.size());//Ovde cemo cuvati u kom smo stanju dosli do svakog stajalista
+	vector<bool> posecen(stajalista.size());//Cuvamo da li smo obisli stajaliste
+
 	while (!dijkstra.empty()) {
 		DijkstraCvor trenutniCvor = dijkstra.top();
 		dijkstra.pop();
-		int trenutnoStajalisteId = trenutniCvor.dohStanicu();
+		int trenutnoStajalisteId = trenutniCvor.dohStanicuId();
 
 		if (posecen[trenutnoStajalisteId]) {
 			continue;
 		}
 		posecen[trenutnoStajalisteId] = true;
-		cvorovi[trenutnoStajalisteId] = trenutniCvor;
-		//cout << stajalista[trenutnoStajalisteId].dohSifru() << " " << trenutniCvor.dohVreme() - polaznoVreme<<"\n";
+		cvorovi[trenutnoStajalisteId] = trenutniCvor;//Pamtimo stanje kako bismo mogli da rekonstruisemo putanju
 
+		//Proveravamo da li smo stigli do cilja i ako jesmo rekonstruisemo putanju
 		if (trenutnoStajalisteId == krajnjeStajalisteId) {
 			vector<Grana> put;
-			while (trenutniCvor.dohProsluStanicu() != -1) {
-				put.push_back(trenutniCvor.dohProsluGranu());
-				trenutniCvor = cvorovi[trenutniCvor.dohProsluStanicu()];
+			while (trenutniCvor.dohProsluStanicuId() != -1) {
+				put.push_back(trenutniCvor.dohProsluGranuId());
+				trenutniCvor = cvorovi[trenutniCvor.dohProsluStanicuId()];
 			}
 			reverse(put.begin(), put.end());
 			return put;
 		}
 
 		int vreme = trenutniCvor.dohVreme();
-		Grana proslaGrana = trenutniCvor.dohProsluGranu();
+		Grana proslaGrana = trenutniCvor.dohProsluGranuId();
 
-		for (Grana grana : graf[trenutnoStajalisteId]) {
-			int presedanja = trenutniCvor.dohPresedanja() + 1;
-			int proslaStanica = trenutniCvor.dohProsluStanicu();
-			int brojStanica = grana.dohBrojStanica();
+		for (Grana& grana : graf[trenutnoStajalisteId]) {
+			int presedanja = trenutniCvor.dohPresedanja() + 1;//Znamo da cemo uvek da presedamo jer to osiguravamo u daljem ifu
+			int proslaStanica = trenutniCvor.dohProsluStanicuId();
+			int udaljenostCiljneStanice = grana.dohBrojStanica();
+			//Obavezujemo se na presedanje jer imamo direktne grane u grafu i izmedju nesusednih stajalista
 			if (proslaStanica != -1 && proslaGrana.dohLinija() == grana.dohLinija()) {
 				continue;
 			}
-			int vremeDolaska = nadjiVremeDolaska(trenutnoStajalisteId, grana, vreme, brojStanica);
+			int vremeDolaska = nadjiVremeDolaska(trenutnoStajalisteId, grana, vreme, udaljenostCiljneStanice);
+			//Proveravamo da li uopste mozemo da dodjemo
 			if (vremeDolaska == -1) {
 				continue;
 			}
@@ -292,13 +326,15 @@ void GradskaMreza::ispisiPutanju(int pocetnoStajaliste, int krajnjeStajaliste, v
 	}
 }
 
-int GradskaMreza::nadjiVremeDolaska(int idStanice,const Grana& granaDoSledece, int vreme, int brojStanica) {
-	int sifraStajalista = stajalista[idStanice].dohSifru();
+//Nalazi vreme dolaska na ciljnu stanicu, udaljenu od trenutne stanice za udaljenostCiljneStanice, ako znamo sa koje stanice krecemo,
+//u koje vreme i kojom linijom zelimo da idemo
+int GradskaMreza::nadjiVremeDolaska(int idTrenStanice,const Grana& granaDoSledece, int vreme, int udaljenostCiljneStanice) {
+	int sifraStajalista = stajalista[idTrenStanice].dohSifru();
 	bool direktanSmer = granaDoSledece.direktna();
 	Linija& linija = linije[granaDoSledece.dohLinija()];
 	int sledeciDolazak = linija.sledeciDolazak(vreme, sifraStajalista, direktanSmer);
 	if (sledeciDolazak == -1) {
 		return -1;
 	}
-	return sledeciDolazak + brojStanica * vremeDoSledeceStanice;
+	return sledeciDolazak + udaljenostCiljneStanice * vremeDoSledeceStanice;
 }

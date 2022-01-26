@@ -31,7 +31,7 @@ private:
 
 	vector<int> stajalista;
 
-	map<int, int> mapaStajalista;
+	map<int, int> mapaStajalista;//Sluzi za mapiranje iz sifre stajalista u indeks u nizu stajalista
 };
 
 #endif

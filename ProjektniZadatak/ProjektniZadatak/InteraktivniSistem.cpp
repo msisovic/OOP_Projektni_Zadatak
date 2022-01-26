@@ -1,32 +1,40 @@
 ﻿#include "InteraktivniSistem.h"
+#include "Izuzeci.h"
 
 void InteraktivniSistem::start() {
 	bool greska = false;
 	while (true) {
-		if (!greska) {
+		try {
+			if (!greska) {
+				cout << "\n";
+				cout << "Dobrodosli u simulator mreze gradskog prevoza. Molimo Vas, odaberite opciju:\n";
+				cout << "1. Ucitavanje podataka o mrezi gradskog prevoza\n";
+				cout << "0. Kraj rada\n";
+			}
 			cout << "\n";
-			cout << "Dobrodosli u simulator mreze gradskog prevoza. Molimo Vas, odaberite opciju:\n";
-			cout << "1. Ucitavanje podataka o mrezi gradskog prevoza\n";
-			cout << "0. Kraj rada\n";
+			greska = false;
+			int opcija;
+			cin >> opcija;
+			cin.get();
+			switch (opcija) {
+			case 0:
+				return;
+				break;
+			case 1:
+				unos_fajlova();
+				odabirFunkcijeGradskeMreze();
+				break;
+			default:
+				cout << "\n";
+				cout << "Izabrali ste nepostojecu opciju, molimo Vas pokusajte ponovo:\n";
+				cout << "\n";
+				greska = true;
+			}
 		}
-		cout << "\n";
-		greska = false;
-		int opcija;
-		cin >> opcija;
-		cin.get();
-		switch (opcija) {
-		case 0:
-			return;
-			break;
-		case 1:
-			unos_fajlova();
-			odabirFunkcijeGradskeMreze();
-			break;
-		default:
+		catch (exception& e) {
 			cout << "\n";
-			cout << "Izabrali ste nepostojecu opciju, molimo Vas pokusajte ponovo:\n";
+			cout << "GRESKA: " << e.what() << "\n";
 			cout << "\n";
-			greska = true;
 		}
 	}
 }
@@ -158,7 +166,9 @@ void InteraktivniSistem::pronalazakPutanje() {
 
 	int sati, minuti;
 	cin >> sati;
-	cin.get();
+	if (cin.get()!=':') {
+		throw INepropisanFormatUlaza();
+	}
 	cin >> minuti;
 	cin.get();
 

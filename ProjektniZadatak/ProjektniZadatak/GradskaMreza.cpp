@@ -312,7 +312,7 @@ void GradskaMreza::ispisiPutanju(int pocetnoStajaliste, int krajnjeStajaliste, v
 
 	int trenStanica = pocetnoStajaliste;
 	string proslaLinija = "";
-	for (Grana grana : putanja) {
+	for (Grana& grana : putanja) {
 		Linija& linija = linije[grana.dohLinija()];
 		izlaz << proslaLinija << "->" << linija.dohOznaku() << "\n";
 		int sledecaStanica = stajalista[grana.dohStanica()].dohSifru();
